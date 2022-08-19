@@ -132,13 +132,16 @@ def aws_lambda_handler(event: dict, context=None):
                 raise ValueError()
 
         resp_body = _endpoint_function(path=path)(session)
-        try:
-            resp_body = json.dumps(resp_body)
-        except ValueError:
-            Log.exception('Can not convert response body to JSON format.')
-            status_code = 500
     except ValueError:
         pass
+
+    try:
+        resp_body = json.dumps(resp_body)
+    except ValueError:
+        msg = 'Can not convert response body to JSON format.'
+        Log.exception(msg)
+        resp_body = msg
+        status_code = 500
 
     return {
         "statusCode": status_code,
