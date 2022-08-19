@@ -8,6 +8,8 @@ WEB_SERVER_ENDPOINTS_VALIDATIONS = {}
 
 
 def _endpoint_function(path: str):
+    if path.startswith('/') and len(path) > 0:
+        path = path[1:]
     if path in WEB_SERVER_ENDPOINTS:
         return WEB_SERVER_ENDPOINTS.get(path)
     else:
@@ -75,9 +77,13 @@ def endpoint(path: str = None, validation: dict = None):
         global WEB_SERVER_ENDPOINTS
         global WEB_SERVER_ENDPOINTS_VALIDATIONS
         if path is None:
-            web_path = str(func.__qualname__).lower().replace('.', '/')
+            web_path = str(func.__qualname__).lower().replace('.', '/').strip()
         else:
-            web_path = path
+            web_path = path.strip()
+
+        if web_path.startswith('/') and len(web_path) > 0:
+            web_path = web_path[1:]
+
         if _is_valid_http_handler(func=func):
             Log.debug(f'Registering endpoint: Path={web_path}, Function={func.__qualname__}')
             if web_path in WEB_SERVER_ENDPOINTS:

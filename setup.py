@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="quickbeserverless",
-    version="0.2.1",
+    version="0.2.2",
     author="Eldad Bishari",
     author_email="eldad@1221tlv.org",
     description="Run your function on serverless platform",
