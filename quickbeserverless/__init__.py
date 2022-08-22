@@ -42,6 +42,7 @@ class HttpSession:
 
     def __init__(self, body: dict = None, parameters: dict = None, headers: dict = None):
         self._response_status = 200
+        self._response_headers = {}
 
         if body is None:
             body = {}
@@ -64,11 +65,18 @@ class HttpSession:
     def response_status(self) -> int:
         return self._response_status
 
+    @property
+    def response_headers(self) -> dict:
+        return self._response_headers
+
     def get(self, name: str, default=None):
         return self._data.get(name, default)
 
     def set_status(self, status: int):
         self._response_status = status
+
+    def set_response_header(self, key: str, value: str):
+        self._response_headers[key] = value
 
 
 def endpoint(path: str = None, validation: dict = None):
@@ -98,6 +106,32 @@ def endpoint(path: str = None, validation: dict = None):
     return decorator
 
 
+def execute_endpoint(path: str, headers: dict, body: dict, parameters: dict) -> (dict, dict, int):
+
+    session = HttpSession(
+        body=body,
+        parameters=parameters,
+        headers=headers
+    )
+    validator = _endpoint_validator(path=path)
+    status_code = 200
+    resp_body = {}
+
+    try:
+        if validator is not None:
+            if not validator.validate(session.data):
+                resp_body = validator.errors
+                status_code = 400
+                raise ValueError()
+
+        resp_body = _endpoint_function(path=path)(session)
+        status_code = session.response_status
+    except ValueError:
+        pass
+
+    return resp_body, session.response_headers, status_code
+
+
 EVENT_BODY_KEY = 'body'
 EVENT_HEADERS_KEY = 'headers'
 EVENT_QUERY_STRING_KEY = 'queryStringParameters'
@@ -121,25 +155,11 @@ def aws_lambda_handler(event: dict, context=None):
     except (ValueError, TypeError):
         pass
 
-    session = HttpSession(
+    resp_body, response_headers, status_code = execute_endpoint(
+        path=path, headers=event.get(EVENT_HEADERS_KEY, {}),
         body=body,
-        parameters=event.get(EVENT_QUERY_STRING_KEY, {}),
-        headers=event.get(EVENT_HEADERS_KEY)
+        parameters=event.get(EVENT_QUERY_STRING_KEY, {})
     )
-    validator = _endpoint_validator(path=path)
-    status_code = 200
-    resp_body = {}
-
-    try:
-        if validator is not None:
-            if not validator.validate(session.data):
-                resp_body = validator.errors
-                status_code = 400
-                raise ValueError()
-
-        resp_body = _endpoint_function(path=path)(session)
-    except ValueError:
-        pass
 
     try:
         resp_body = json.dumps(resp_body)
@@ -150,6 +170,8 @@ def aws_lambda_handler(event: dict, context=None):
         status_code = 500
 
     return {
+
         "statusCode": status_code,
-        "body": resp_body
+        EVENT_HEADERS_KEY: response_headers,
+        EVENT_BODY_KEY: resp_body
     }
