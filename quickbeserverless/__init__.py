@@ -23,7 +23,7 @@ def _endpoint_validator(path: str) -> Validator:
         return None
 
 
-def _is_valid_http_handler(func) -> bool:
+def is_valid_http_handler(func) -> bool:
     args_spec = getfullargspec(func=func)
     try:
         args_spec.annotations.pop('return')
@@ -92,7 +92,7 @@ def endpoint(path: str = None, validation: dict = None):
         if web_path.startswith('/') and len(web_path) > 0:
             web_path = web_path[1:]
 
-        if _is_valid_http_handler(func=func):
+        if is_valid_http_handler(func=func):
             Log.debug(f'Registering endpoint: Path={web_path}, Function={func.__qualname__}')
             if web_path in WEB_SERVER_ENDPOINTS:
                 raise FileExistsError(f'Endpoint {web_path} already exists.')

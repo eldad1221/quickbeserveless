@@ -1,5 +1,5 @@
 import unittest
-from quickbeserverless import HttpSession, _is_valid_http_handler
+from quickbeserverless import HttpSession, is_valid_http_handler
 
 
 def demo_1(session: HttpSession):
@@ -18,13 +18,13 @@ class WebServerTestCase(unittest.TestCase):
 
     def test_http_handler(self):
 
-        self.assertEqual(True, _is_valid_http_handler(func=demo_1))
+        self.assertEqual(True, is_valid_http_handler(func=demo_1))
 
         with self.assertRaises(TypeError):
-            self.assertEqual(True, _is_valid_http_handler(func=demo_2))
+            self.assertEqual(True, is_valid_http_handler(func=demo_2))
 
         with self.assertRaises(TypeError):
-            self.assertEqual(True, _is_valid_http_handler(func=demo_3))
+            self.assertEqual(True, is_valid_http_handler(func=demo_3))
 
 
 if __name__ == '__main__':
