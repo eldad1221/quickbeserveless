@@ -30,7 +30,7 @@ def _is_valid_http_handler(func) -> bool:
     except KeyError:
         pass
     arg_types = args_spec.annotations.values()
-    if len(arg_types) == 1 and HttpSession in arg_types:
+    if len(arg_types) == 1 and issubclass(list(arg_types)[0], HttpSession):
         return True
     else:
         raise TypeError(
