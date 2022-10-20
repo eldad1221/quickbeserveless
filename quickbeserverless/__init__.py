@@ -113,6 +113,10 @@ def execute_endpoint(path: str, headers: dict, body: dict, parameters: dict) -> 
         parameters=parameters,
         headers=headers
     )
+    return execute_endpoint_with_session(path=path, session=session)
+
+
+def execute_endpoint_with_session(path: str, session: HttpSession) -> (dict, dict, int):
     validator = _endpoint_validator(path=path)
     status_code = 200
     resp_body = {}

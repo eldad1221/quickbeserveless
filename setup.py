@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="quickbeserverless",
-    version="0.3.2",
+    version="1.0.0",
     author="Eldad Bishari",
     author_email="eldad@1221tlv.org",
     description="Run your function on serverless platform",
@@ -16,7 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'cerberus==1.3.4',
-        'quickbelog==1.1.0',
+        'quickbelog',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
