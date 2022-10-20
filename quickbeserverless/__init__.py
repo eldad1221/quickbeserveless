@@ -121,17 +121,14 @@ def execute_endpoint_with_session(path: str, session: HttpSession) -> (dict, dic
     status_code = 200
     resp_body = {}
 
-    try:
-        if validator is not None:
-            if not validator.validate(session.data):
-                resp_body = validator.errors
-                status_code = 400
-                raise ValueError()
+    if validator is not None:
+        if not validator.validate(session.data):
+            resp_body = validator.errors
+            status_code = 400
 
+    if status_code == 200:
         resp_body = _endpoint_function(path=path)(session)
         status_code = session.response_status
-    except ValueError:
-        pass
 
     return resp_body, session.response_headers, status_code
 
