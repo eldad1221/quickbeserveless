@@ -125,6 +125,8 @@ def execute_endpoint_with_session(path: str, session: HttpSession) -> (dict, dic
         if not validator.validate(session.data):
             resp_body = validator.errors
             status_code = 400
+        else:
+            session._data = validator.normalized(session.data)
 
     if status_code == 200:
         resp_body = _endpoint_function(path=path)(session)
