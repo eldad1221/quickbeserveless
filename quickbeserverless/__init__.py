@@ -39,7 +39,7 @@ def _endpoint_function(path: str):
         raise NotImplementedError(f'No implementation for path /{path}.')
 
 
-def _endpoint_validator(path: str) -> Validator:
+def get_endpoint_validator(path: str) -> Validator:
     if path in WEB_SERVER_ENDPOINTS_VALIDATIONS:
         return WEB_SERVER_ENDPOINTS_VALIDATIONS.get(path)
     else:
@@ -140,7 +140,7 @@ def execute_endpoint(path: str, headers: dict, body: dict, parameters: dict) -> 
 
 
 def execute_endpoint_with_session(path: str, session: HttpSession) -> (dict, dict, int):
-    validator = _endpoint_validator(path=path)
+    validator = get_endpoint_validator(path=path)
     status_code = 200
     resp_body = {}
 
