@@ -7,6 +7,29 @@ WEB_SERVER_ENDPOINTS = {}
 WEB_SERVER_ENDPOINTS_VALIDATIONS = {}
 
 
+class EndPointValidator(Validator):
+
+    def _validate_doc(self, constraint, field, value):
+        """
+        For documentation text
+        :param constraint:
+        :param field:
+        :param value:
+        :return:
+        """
+        pass
+
+    def _validate_example(self, constraint, field, value):
+        """
+        For example value
+        :param constraint:
+        :param field:
+        :param value:
+        :return:
+        """
+        pass
+
+
 def _endpoint_function(path: str):
     if path.startswith('/') and len(path) > 0:
         path = path[1:]
@@ -98,7 +121,7 @@ def endpoint(path: str = None, validation: dict = None):
                 raise FileExistsError(f'Endpoint {web_path} already exists.')
             WEB_SERVER_ENDPOINTS[web_path] = func
             if isinstance(validation, dict):
-                validator = Validator(validation)
+                validator = EndPointValidator(validation, purge_unknown=True)
                 validator.allow_unknown = True
                 WEB_SERVER_ENDPOINTS_VALIDATIONS[web_path] = validator
             return func

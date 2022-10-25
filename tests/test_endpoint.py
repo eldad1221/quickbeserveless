@@ -17,7 +17,12 @@ TEST_EVENT = {
 
 
 @endpoint(validation={
-    'name': {'required': True, 'type': 'string'}
+    'name': {
+        'required': True,
+        'type': 'string',
+        'doc': 'Test doc text',
+        'example': 'Some Name'
+    }
 }
 )
 def hello(session: HttpSession):
