@@ -5,6 +5,8 @@ from inspect import getfullargspec
 
 WEB_SERVER_ENDPOINTS = {}
 WEB_SERVER_ENDPOINTS_VALIDATIONS = {}
+WEB_SERVER_ENDPOINTS_DOCS = {}
+WEB_SERVER_ENDPOINTS_EXAMPLE_RESPONSES = {}
 
 
 class EndPointValidator(Validator):
@@ -102,11 +104,21 @@ class HttpSession:
         self._response_headers[key] = value
 
 
-def endpoint(path: str = None, validation: dict = None):
+def endpoint(path: str = None, validation: dict = None, doc: str = None, example=None):
+    """
+    Endpoint decorator
+    :param path: Web path (route) to map
+    :param validation: Validation schema, check this for more info https://docs.python-cerberus.org/en/stable/
+    :param doc: Documentation text
+    :param example: Example for function response
+    :return:
+    """
 
     def decorator(func):
         global WEB_SERVER_ENDPOINTS
         global WEB_SERVER_ENDPOINTS_VALIDATIONS
+        global WEB_SERVER_ENDPOINTS_DOCS
+        global WEB_SERVER_ENDPOINTS_EXAMPLE_RESPONSES
         if path is None:
             web_path = str(func.__qualname__).lower().replace('.', '/').strip()
         else:
@@ -119,11 +131,19 @@ def endpoint(path: str = None, validation: dict = None):
             Log.debug(f'Registering endpoint: Path={web_path}, Function={func.__qualname__}')
             if web_path in WEB_SERVER_ENDPOINTS:
                 raise FileExistsError(f'Endpoint {web_path} already exists.')
+
             WEB_SERVER_ENDPOINTS[web_path] = func
+
             if isinstance(validation, dict):
                 validator = EndPointValidator(validation, purge_unknown=True)
                 validator.allow_unknown = True
                 WEB_SERVER_ENDPOINTS_VALIDATIONS[web_path] = validator
+
+            if doc is not None:
+                WEB_SERVER_ENDPOINTS_DOCS[web_path] = doc
+
+            if example is not None:
+                WEB_SERVER_ENDPOINTS_EXAMPLE_RESPONSES[web_path] = example
             return func
 
     return decorator
